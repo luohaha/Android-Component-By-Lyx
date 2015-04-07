@@ -3,11 +3,14 @@ package com.example.root.lyx_android_component.PictureWall;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.media.Image;
+import android.provider.MediaStore;
 import android.text.Layout;
 import android.util.LruCache;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AbsListView;
 import android.widget.ArrayAdapter;
 import android.widget.AbsListView.OnScrollListener;
 import android.widget.GridView;
@@ -79,7 +82,96 @@ public class PictureWallAdapter extends ArrayAdapter<String> implements OnScroll
         return view;
     }
 
+    /**
+     * set a picture for imageView
+     * @param imageUrl key of LruCache
+     * @param imageView the widget used to show this picture
+     */
     private void setImageView(String imageUrl, ImageView  imageView) {
-        
+        Bitmap bitmap = getBitmapFromCache(imageUrl);
+        if (bitmap != null) {
+            imageView.setImageBitmap(bitmap);
+        } else {
+            imageView.setImageResource(R.drawable.ic_launcher);
+        }
+    }
+
+    /**put the bitmap into the mMemoryCache
+     * @param key
+     * @param value
+     */
+    private void addBitmapToCache(String key, Bitmap value) {
+        if (getBitmapFromCache(key) == null) {
+            mMemoryCache.put(key, value);
+        }
+    }
+
+    /**
+     * get a bitmap form memory cache when url equal to key
+     * @param key the bitmap's key which we want to get
+     * @return the bitmap if it's key equal to key
+     */
+    private Bitmap getBitmapFromCache(String key) {
+        return mMemoryCache.get(key);
+    }
+
+    /**
+     * get the gridview's status, when gridview is rest and load pictures, else
+     * stop down load pictures
+     * @param view
+     * @param scrollState
+     */
+    @Override
+    public void onScrollStateChanged(AbsListView view, int scrollState) {
+        if (scrollState == SCROLL_STATE_IDLE) {
+            //down load the picure when stop
+
+        } else {
+
+        }
+    }
+
+    @Override
+    public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
+        mFirstVisiblePicturePosition = firstVisibleItem;
+        mVisiblePictureInscreen = visibleItemCount;
+        //when start app, we should load pictures
+        if (isFirstEnter && visibleItemCount > 0) {
+
+        }
+    }
+
+    /**
+     * if the bitmap is not in cache, then create a new thread to down load it
+     * @param firstVisibleItem
+     * @param visibleItemCount
+     */
+    private void loadBitmap(int firstVisibleItem, int visibleItemCount) {
+        try {
+            for (int i = firstVisibleItem; i < firstVisibleItem + visibleItemCount; i++) {
+                String imageUrl = Images.pictures[i];
+                Bitmap bitmap = getBitmapFromCache(imageUrl);
+                if (bitmap == null) {
+                    BitmapWorkerTask task = new BitmapWorkerTask();
+                    mTasks.add(task);
+                    task.execute(imageUrl);
+                } else {
+                    ImageView imageView = (ImageView) mPhotoWall.findViewWithTag(imageUrl);
+                    if (imageView != null && bitmap != null) {
+                        imageView.setImageBitmap(bitmap);
+                    }
+                }
+            }
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+    private void cancelAllTasks() {
+        if (mTasks != null) {
+            for (BitmapWorkerTask task : mTasks) {
+                task.cancel(false);
+            }
+        }
     }
 }
