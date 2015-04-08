@@ -174,7 +174,7 @@ public class PictureWallAdapter extends ArrayAdapter<String> implements OnScroll
             e.printStackTrace();
         }
     }
-    private void cancelAllTasks() {
+    public void cancelAllTasks() {
         if (mTasks != null) {
             for (BitmapWorkerTask task : mTasks) {
                 task.cancel(false);

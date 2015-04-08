@@ -1,4 +1,4 @@
-package com.example.root.lyx_android_component;
+package com.example.root.lyx_android_component.PictureWall;
 
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
@@ -6,11 +6,13 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.GridView;
 
-import com.example.root.lyx_android_component.PictureWall.Images;
-import com.example.root.lyx_android_component.PictureWall.PictureWallAdapter;
+import com.example.root.lyx_android_component.R;
+/**
+* this is the example class for mainactivity,
+* you can copy it to mainactivity to use picture wall
+* */
 
-
-public class MainActivity extends ActionBarActivity {
+public class DemoMainActivity extends ActionBarActivity {
     private GridView mGridView;
     private PictureWallAdapter mAdapter;
     @Override
