@@ -3,7 +3,9 @@ package com.example.root.lyx_android_component.PictureWall;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.media.Image;
+import android.os.AsyncTask;
 import android.provider.MediaStore;
 import android.text.Layout;
 import android.util.LruCache;
@@ -18,7 +20,10 @@ import android.widget.ImageView;
 
 import com.example.root.lyx_android_component.R;
 
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Created by Yixin Luo on 15-4-7.
@@ -38,7 +43,7 @@ public class PictureWallAdapter extends ArrayAdapter<String> implements OnScroll
     /**
      * 正在或等待下载的任务
      * */
-    private Set<BitmapWorkerTask>() mTasks;
+    private Set<BitmapWorkerTask> mTasks;
     /**
      * 第一张可见图片的坐标
      * */
@@ -125,9 +130,10 @@ public class PictureWallAdapter extends ArrayAdapter<String> implements OnScroll
     public void onScrollStateChanged(AbsListView view, int scrollState) {
         if (scrollState == SCROLL_STATE_IDLE) {
             //down load the picure when stop
-
+            loadBitmap(mFirstVisiblePicturePosition, mVisiblePictureInscreen);
         } else {
-
+            //when it scroll, stop load bitmap
+            cancelAllTasks();
         }
     }
 
@@ -135,9 +141,10 @@ public class PictureWallAdapter extends ArrayAdapter<String> implements OnScroll
     public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
         mFirstVisiblePicturePosition = firstVisibleItem;
         mVisiblePictureInscreen = visibleItemCount;
-        //when start app, we should load pictures
+        //when we start the app first time, we should load pictures
         if (isFirstEnter && visibleItemCount > 0) {
-
+            loadBitmap(firstVisibleItem, visibleItemCount);
+            isFirstEnter = false;
         }
     }
 
@@ -156,7 +163,7 @@ public class PictureWallAdapter extends ArrayAdapter<String> implements OnScroll
                     mTasks.add(task);
                     task.execute(imageUrl);
                 } else {
-                    ImageView imageView = (ImageView) mPhotoWall.findViewWithTag(imageUrl);
+                    ImageView imageView = (ImageView) mGridView.findViewWithTag(imageUrl);
                     if (imageView != null && bitmap != null) {
                         imageView.setImageBitmap(bitmap);
                     }
@@ -174,4 +181,61 @@ public class PictureWallAdapter extends ArrayAdapter<String> implements OnScroll
             }
         }
     }
+
+    class BitmapWorkerTask extends AsyncTask<String, Void, Bitmap> {
+        private String imageUrl;
+
+        /**start a download task in background
+         * @param params the url
+         * @return
+         */
+        @Override
+        protected Bitmap doInBackground(String... params) {
+            imageUrl = params[0];
+            Bitmap bitmap = downloadBitmap(params[0]);
+            if (bitmap != null) {
+                addBitmapToCache(params[0], bitmap);
+            }
+            return bitmap;
+        }
+
+        /**
+         * find the imageview which is connected to a bitmap using tag.
+         * and show the bitmap in this imageview
+         * @param bitmap the bitmap we want to show in imageview
+         */
+        protected void onPostExecute(Bitmap bitmap) {
+            super.onPostExecute(bitmap);
+
+            ImageView imageView = (ImageView) mGridView.findViewWithTag(imageUrl);
+            if (imageView != null && bitmap != null) {
+                imageView.setImageBitmap(bitmap);
+            }
+            mTasks.remove(this);
+        }
+        /**
+         * open a http connection and down load a picture from internet
+         * @param imageUrl the url of picture we want to download
+         * @return the bitmap what we get
+         */
+        private Bitmap downloadBitmap(String imageUrl) {
+            Bitmap bitmap = null;
+            HttpURLConnection httpURLConnection = null;
+            try {
+                URL url = new URL(imageUrl);
+                httpURLConnection = (HttpURLConnection) url.openConnection();
+                httpURLConnection.setConnectTimeout(5000);
+                httpURLConnection.setReadTimeout(10000);
+                bitmap = BitmapFactory.decodeStream(httpURLConnection.getInputStream());
+            } catch (Exception e) {
+                e.printStackTrace();
+            } finally {
+                if (httpURLConnection != null) {
+                    httpURLConnection.disconnect();
+                }
+            }
+            return bitmap;
+        }
+    }
+
 }
