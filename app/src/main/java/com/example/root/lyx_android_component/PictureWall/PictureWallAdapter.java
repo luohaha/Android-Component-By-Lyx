@@ -60,7 +60,7 @@ public class PictureWallAdapter extends ArrayAdapter<String> implements OnScroll
         mGridView = gridView;
         mTasks = new HashSet<BitmapWorkerTask>();
         //get max useful memory size
-        int maxMemory = (int) Runtime.getRuntime().maxMemory();
+        int maxMemory = (int) (Runtime.getRuntime().maxMemory()/8);
         //use 1/8 as cache size
         int cacheSize = (int) maxMemory/8;
         mMemoryCache = new LruCache<String, Bitmap>(cacheSize) {
@@ -226,7 +226,13 @@ public class PictureWallAdapter extends ArrayAdapter<String> implements OnScroll
                 httpURLConnection = (HttpURLConnection) url.openConnection();
                 httpURLConnection.setConnectTimeout(5000);
                 httpURLConnection.setReadTimeout(10000);
-                bitmap = BitmapFactory.decodeStream(httpURLConnection.getInputStream());
+                final BitmapFactory.Options options = new BitmapFactory.Options();
+                options.inJustDecodeBounds = true;
+                BitmapFactory.decodeStream(httpURLConnection.getInputStream(), null, options);
+                options.inSampleSize = calculateInSampleSize(options, 100, 100);
+                options.inJustDecodeBounds = false;
+                bitmap = BitmapFactory.decodeStream(httpURLConnection.getInputStream(), null, options);
+
             } catch (Exception e) {
                 e.printStackTrace();
             } finally {
@@ -236,6 +242,30 @@ public class PictureWallAdapter extends ArrayAdapter<String> implements OnScroll
             }
             return bitmap;
         }
+
+        /**
+         * calculate the radio using request width and height
+         * @param options which we want to get the old height and width from
+         * @param requestWidth
+         * @param requestHeight
+         * @return
+         */
+        private int calculateInSampleSize(BitmapFactory.Options options, int requestWidth,
+                                                 int requestHeight) {
+            //get the old height and width
+            final int height = options.outHeight;
+            final int width = options.outWidth;
+
+            int inSampleSize = 1;
+            //not suitable
+            if (height > requestHeight || width > requestWidth) {
+                final int heightRadio = Math.round((float) height / (float) requestHeight);
+                final int widthRadio = Math.round((float) width / (float) requestWidth);
+                inSampleSize = (heightRadio < widthRadio) ? heightRadio : widthRadio;
+            }
+            return inSampleSize;
+        }
+
     }
 
 }

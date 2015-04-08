@@ -17,7 +17,7 @@ public class MainActivity extends ActionBarActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        mGridView = (GridView) findViewById(R.id.picture_wall_picure);
+        mGridView = (GridView) findViewById(R.id.photo_wall);
         mAdapter = new PictureWallAdapter(this, 0, Images.pictures, mGridView);
         mGridView.setAdapter(mAdapter);
     }
