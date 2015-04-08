@@ -20,6 +20,7 @@ import android.widget.ImageView;
 
 import com.example.root.lyx_android_component.R;
 
+import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.HashSet;
@@ -138,7 +139,8 @@ public class PictureWallAdapter extends ArrayAdapter<String> implements OnScroll
     }
 
     @Override
-    public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
+    public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount,
+                         int totalItemCount) {
         mFirstVisiblePicturePosition = firstVisibleItem;
         mVisiblePictureInscreen = visibleItemCount;
         //when we start the app first time, we should load pictures
@@ -182,6 +184,9 @@ public class PictureWallAdapter extends ArrayAdapter<String> implements OnScroll
         }
     }
 
+    /**
+     *
+     */
     class BitmapWorkerTask extends AsyncTask<String, Void, Bitmap> {
         private String imageUrl;
 
@@ -222,17 +227,17 @@ public class PictureWallAdapter extends ArrayAdapter<String> implements OnScroll
             Bitmap bitmap = null;
             HttpURLConnection httpURLConnection = null;
             try {
-                URL url = new URL(imageUrl);
-                httpURLConnection = (HttpURLConnection) url.openConnection();
-                httpURLConnection.setConnectTimeout(5000);
-                httpURLConnection.setReadTimeout(10000);
-                final BitmapFactory.Options options = new BitmapFactory.Options();
-                options.inJustDecodeBounds = true;
-                BitmapFactory.decodeStream(httpURLConnection.getInputStream(), null, options);
+                //create a new input stream
+                InputStream is = getInputStreamFromHttp(httpURLConnection, imageUrl, 5000, 10000);
+                BitmapFactory.Options options = new BitmapFactory.Options();
+                BitmapFactory.decodeStream(is, null, options);
                 options.inSampleSize = calculateInSampleSize(options, 100, 100);
                 options.inJustDecodeBounds = false;
-                bitmap = BitmapFactory.decodeStream(httpURLConnection.getInputStream(), null, options);
-
+                is.close();
+                //create a new input stream again, or you can not down load this picture
+                InputStream iss = getInputStreamFromHttp(httpURLConnection, imageUrl, 5000, 10000);
+                bitmap = BitmapFactory.decodeStream(iss, null, options);
+                iss.close();
             } catch (Exception e) {
                 e.printStackTrace();
             } finally {
@@ -243,6 +248,33 @@ public class PictureWallAdapter extends ArrayAdapter<String> implements OnScroll
             return bitmap;
         }
 
+        /**
+         * get input stream from http connection, using imageUrl and setting connection timeout and
+         * read time out
+         * @param httpURLConnection using a http connection to finish the job
+         * @param imageUrl the image's url
+         * @param connectTimeOut http's connection timeout which you want to set
+         * @param readTimeOut
+         * @return
+         */
+        private InputStream getInputStreamFromHttp(HttpURLConnection httpURLConnection,
+              String imageUrl, int connectTimeOut, int readTimeOut) {
+            InputStream iss = null;
+            try {
+                URL url = new URL(imageUrl);
+                httpURLConnection = (HttpURLConnection) url.openConnection();
+                httpURLConnection.setConnectTimeout(connectTimeOut);
+                httpURLConnection.setReadTimeout(readTimeOut);
+                iss = httpURLConnection.getInputStream();
+            } catch (Exception e) {
+                e.printStackTrace();
+            } finally {
+                if (httpURLConnection != null) {
+                    httpURLConnection.disconnect();
+                }
+            }
+            return iss;
+        }
         /**
          * calculate the radio using request width and height
          * @param options which we want to get the old height and width from
