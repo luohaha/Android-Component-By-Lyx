@@ -230,7 +230,6 @@ public class PictureWallAdapter extends ArrayAdapter<String> implements OnScroll
             InputStream iss = null;
             try {
                 //create a new input stream
-<<<<<<< HEAD
                // InputStream is = getInputStreamFromHttp(imageUrl, 5000, 10000);
                 URL url = new URL(imageUrl);
                 httpURLConnection = (HttpURLConnection) url.openConnection();
@@ -241,16 +240,11 @@ public class PictureWallAdapter extends ArrayAdapter<String> implements OnScroll
                 options.inJustDecodeBounds = true;
 
 
-=======
-                InputStream is = getInputStreamFromHttp(httpURLConnection, imageUrl, 5000, 10000);
-                BitmapFactory.Options options = new BitmapFactory.Options();
->>>>>>> cc38c1dbba3c6e187b992af8d7e7383987c1beb0
                 BitmapFactory.decodeStream(is, null, options);
                 options.inSampleSize = calculateInSampleSize(options, 100, 100);
                 options.inJustDecodeBounds = false;
                 is.close();
                 //create a new input stream again, or you can not down load this picture
-<<<<<<< HEAD
               //  InputStream iss = getInputStreamFromHttp(imageUrl, 5000, 10000);
                 url = new URL(imageUrl);
                 httpURLConnection = (HttpURLConnection) url.openConnection();
