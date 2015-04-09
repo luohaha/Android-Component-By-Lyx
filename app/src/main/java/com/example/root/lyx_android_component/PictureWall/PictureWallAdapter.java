@@ -230,6 +230,7 @@ public class PictureWallAdapter extends ArrayAdapter<String> implements OnScroll
             InputStream iss = null;
             try {
                 //create a new input stream
+<<<<<<< HEAD
                // InputStream is = getInputStreamFromHttp(imageUrl, 5000, 10000);
                 URL url = new URL(imageUrl);
                 httpURLConnection = (HttpURLConnection) url.openConnection();
@@ -240,11 +241,16 @@ public class PictureWallAdapter extends ArrayAdapter<String> implements OnScroll
                 options.inJustDecodeBounds = true;
 
 
+=======
+                InputStream is = getInputStreamFromHttp(httpURLConnection, imageUrl, 5000, 10000);
+                BitmapFactory.Options options = new BitmapFactory.Options();
+>>>>>>> cc38c1dbba3c6e187b992af8d7e7383987c1beb0
                 BitmapFactory.decodeStream(is, null, options);
                 options.inSampleSize = calculateInSampleSize(options, 100, 100);
                 options.inJustDecodeBounds = false;
                 is.close();
                 //create a new input stream again, or you can not down load this picture
+<<<<<<< HEAD
               //  InputStream iss = getInputStreamFromHttp(imageUrl, 5000, 10000);
                 url = new URL(imageUrl);
                 httpURLConnection = (HttpURLConnection) url.openConnection();
@@ -281,6 +287,11 @@ public class PictureWallAdapter extends ArrayAdapter<String> implements OnScroll
                 httpURLConnection.setConnectTimeout(connectTimeOut);
                 httpURLConnection.setReadTimeout(readTimeOut);
                 iss = httpURLConnection.getInputStream();
+=======
+                InputStream iss = getInputStreamFromHttp(httpURLConnection, imageUrl, 5000, 10000);
+                bitmap = BitmapFactory.decodeStream(iss, null, options);
+                iss.close();
+>>>>>>> cc38c1dbba3c6e187b992af8d7e7383987c1beb0
             } catch (Exception e) {
                 e.printStackTrace();
             } finally {
@@ -291,6 +302,33 @@ public class PictureWallAdapter extends ArrayAdapter<String> implements OnScroll
             return iss;
         }
         */
+        /**
+         * get input stream from http connection, using imageUrl and setting connection timeout and
+         * read time out
+         * @param httpURLConnection using a http connection to finish the job
+         * @param imageUrl the image's url
+         * @param connectTimeOut http's connection timeout which you want to set
+         * @param readTimeOut
+         * @return
+         */
+        private InputStream getInputStreamFromHttp(HttpURLConnection httpURLConnection,
+              String imageUrl, int connectTimeOut, int readTimeOut) {
+            InputStream iss = null;
+            try {
+                URL url = new URL(imageUrl);
+                httpURLConnection = (HttpURLConnection) url.openConnection();
+                httpURLConnection.setConnectTimeout(connectTimeOut);
+                httpURLConnection.setReadTimeout(readTimeOut);
+                iss = httpURLConnection.getInputStream();
+            } catch (Exception e) {
+                e.printStackTrace();
+            } finally {
+                if (httpURLConnection != null) {
+                    httpURLConnection.disconnect();
+                }
+            }
+            return iss;
+        }
         /**
          * calculate the radio using request width and height
          * @param options which we want to get the old height and width from
