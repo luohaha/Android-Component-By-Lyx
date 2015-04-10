@@ -72,10 +72,25 @@ public class PictureLoader {
         int width = options.outWidth;
         int InSampleSize = 1;
         if (requestWidth < width) {
-            InSampleSize = Math.round(width / requestWidth);
+            InSampleSize = Math.round((float)width / (float)requestWidth);
         }
         return InSampleSize;
     }
 
-    
+    /**
+     * decode the bitmap from file path
+     * @param filePathName where the picture from
+     * @param requestWidth the width we want
+     * @return the bitmap after decoding
+     */
+    private Bitmap decodeBitmapFromResource(String filePathName, int requestWidth) {
+        BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inJustDecodeBounds = true;
+        BitmapFactory.decodeFile(filePathName, options);
+        options.inSampleSize = calculateInSampleSize(options, requestWidth);
+        options.inJustDecodeBounds = false;
+        return BitmapFactory.decodeFile(filePathName, options);
+    }
+
+
 }
