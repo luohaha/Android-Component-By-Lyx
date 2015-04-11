@@ -27,32 +27,32 @@ public class FallScrollView extends ScrollView implements OnTouchListener {
     /**
      * 记录当前已加载到第几页
      */
-    private int page;
+    private int mPage;
 
     /**
      * 每一列的宽度
      */
-    private int columnWidth;
+    private int mColumnWidth;
 
     /**
      * 当前第一列的高度
      */
-    private int firstColumnHeight;
+    private int mFirstColumnHeight;
 
     /**
      * 当前第二列的高度
      */
-    private int secondColumnHeight;
+    private int mSecondColumnHeight;
 
     /**
      * 当前第三列的高度
      */
-    private int thirdColumnHeight;
+    private int mThirdColumnHeight;
 
     /**
      * 是否已加载过一次layout，这里onLayout中的初始化只需加载一次
      */
-    private boolean loadOnce;
+    private boolean isLoadFirstTime;
 
     /**
      * 对图片进行管理的工具类
@@ -62,22 +62,22 @@ public class FallScrollView extends ScrollView implements OnTouchListener {
     /**
      * 第一列的布局
      */
-    private LinearLayout firstColumn;
+    private LinearLayout mFirstColumn;
 
     /**
      * 第二列的布局
      */
-    private LinearLayout secondColumn;
+    private LinearLayout mSecondColumn;
 
     /**
      * 第三列的布局
      */
-    private LinearLayout thirdColumn;
+    private LinearLayout mThirdColumn;
 
     /**
      * 记录所有正在下载或等待下载的任务。
      */
-    private static Set<LoadImageTask> taskCollection;
+    private static Set<LoadImageTask> mTaskCollection;
 
     /**
      * MyScrollView下的直接子布局。
@@ -102,7 +102,7 @@ public class FallScrollView extends ScrollView implements OnTouchListener {
     public FallScrollView(Context context, AttributeSet attrs) {
         super(context, attrs);
         mPictureLoader = PictureLoader.getInstance();
-        taskCollection = new HashSet<LoadImageTask>();
+        mTaskCollection = new HashSet<LoadImageTask>();
         setOnClickListener(this);
     }
 
@@ -113,7 +113,7 @@ public class FallScrollView extends ScrollView implements OnTouchListener {
             int scrollY = fallScrollView.getScrollY();
             if (scrollY == lastScrollY) {
                 if (scrollViewHeight + scrollY >= scrollLayout.getHeight()
-                        && taskCollection.isEmpty()) {
+                        && mTaskCollection.isEmpty()) {
                     fallScrollView.loadMoreImage();
                 }
 
@@ -126,6 +126,6 @@ public class FallScrollView extends ScrollView implements OnTouchListener {
         };
     };
 
-
+    
 }
 
