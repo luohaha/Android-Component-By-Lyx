@@ -1,8 +1,17 @@
 package com.example.root.lyx_android_component.PictureWallFall;
 
+import android.content.Context;
+import android.os.Message;
+import android.util.AttributeSet;
+import android.view.View;
 import android.view.View.OnTouchListener;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ScrollView;
 
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
 import java.util.logging.Handler;
 import java.util.logging.LogRecord;
 
@@ -48,7 +57,7 @@ public class FallScrollView extends ScrollView implements OnTouchListener {
     /**
      * 对图片进行管理的工具类
      */
-    private ImageLoader imageLoader;
+    private PictureLoader mPictureLoader;
 
     /**
      * 第一列的布局
@@ -88,22 +97,35 @@ public class FallScrollView extends ScrollView implements OnTouchListener {
     /**
      * 记录所有界面上的图片，用以可以随时控制对图片的释放。
      */
-    private List<ImageView> imageViewList = new ArrayList<ImageView>();
+    private List<ImageView> mImageViewList = new ArrayList<ImageView>();
 
-    Handler mHandler = new Handler() {
-        @Override
-        public void close() {
+    public FallScrollView(Context context, AttributeSet attrs) {
+        super(context, attrs);
+        mPictureLoader = PictureLoader.getInstance();
+        taskCollection = new HashSet<LoadImageTask>();
+        setOnClickListener(this);
+    }
 
-        }
+    private static Handler mHandler = new Handler() {
 
-        @Override
-        public void flush() {
+        public void handleMessage(Message message) {
+            FallScrollView fallScrollView = (FallScrollView) message.obj;
+            int scrollY = fallScrollView.getScrollY();
+            if (scrollY == lastScrollY) {
+                if (scrollViewHeight + scrollY >= scrollLayout.getHeight()
+                        && taskCollection.isEmpty()) {
+                    fallScrollView.loadMoreImage();
+                }
 
-        }
-
-        @Override
-        public void publish(LogRecord record) {
-
-        }
+            } else {
+                lastScrollY = scrollY;
+                Message message1 = new Message();
+                message1.obj = fallScrollView;
+                mHandler.sendMessageDelayed(message1, 5);
+            }
+        };
     };
+
+
 }
+
