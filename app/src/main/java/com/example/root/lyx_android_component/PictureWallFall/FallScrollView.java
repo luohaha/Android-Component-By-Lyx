@@ -126,6 +126,13 @@ public class FallScrollView extends ScrollView implements OnTouchListener {
         };
     };
 
-    
+    protected void onLayout(boolean changed, int l, int t, int r, int b) {
+        super.onLayout(changed, l, t, r, b);
+        if (changed && !isLoadFirstTime) {
+            scrollViewHeight = getHeight();
+            scrollLayout = getChildAt(0);
+            mFirstColumn = (LinearLayout) findViewById(R.id.)
+        }
+    }
 }
 
