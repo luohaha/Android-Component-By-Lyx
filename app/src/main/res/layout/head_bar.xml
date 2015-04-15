@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:fontawesometext="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="#333" >
+
+    <com.beardedhen.androidbootstrap.FontAwesomeText
+        android:id="@+id/button_left"
+        android:layout_width="50dp"
+        android:layout_height="match_parent"
+        android:layout_centerVertical="true"
+        android:layout_marginLeft="5dip"
+        android:layout_marginTop="5dip"
+        fontawesometext:fa_icon="fa-close"
+        android:textSize="32sp"
+        android:textColor="#fff" />
+
+    <TextView
+        android:id="@+id/title_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:layout_marginTop="5dip"
+        android:text="This is Title"
+        android:textColor="#fff"
+        android:textSize="20sp" />
+
+    <!--  <Button
+          android:id="@+id/button_right"
+          android:layout_width="50dp"
+          android:layout_height="match_parent"
+          android:layout_alignParentRight="true"
+          android:layout_marginRight="5dp"
+          android:background="@drawable/more"
+          android:textColor="#fff" /> -->
+    <com.beardedhen.androidbootstrap.FontAwesomeText
+        android:id="@+id/button_right"
+        android:layout_width="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_height="match_parent"
+        android:layout_marginRight="5dip"
+        fontawesometext:fa_icon="fa-chevron-down"
+        android:layout_marginTop="5dip"
+        android:textSize="32sp"
+        android:textColor="#fff"
+        />
+
+
+</RelativeLayout>
